@@ -1,13 +1,15 @@
 // Importar dependencias y modulos
 const bcrypt = require("bcrypt");
-const mongoosePaginate = require("mongoose-pagination");
+const mongoosePaginate = require("mongoose-paginate-v2");
 const fs = require("fs");
+const path = require("path");
 
 // Importar modelos
 const User = require("../models/user");
 
 // Importar servicios
 const jwt = require("../services/jwt");
+const followService = require("../services/followService");
 const user = require("../models/user");
 const fastify = require("fastify");
 
@@ -153,10 +155,15 @@ const profile = async (req, res) => {
       });
     }
 
+    // Info de seguimiento
+    const followInfo = await followService.followThisUser(req.user.id, id);
+
     // Devolver resultado con contraseña y rol ocultos
     return res.status(200).send({
       status: "success",
       user: userProfile,
+      following: followInfo.following,
+      follower: followInfo.follower,
     });
   } catch (error) {
     return res.status(500).send({
@@ -167,36 +174,56 @@ const profile = async (req, res) => {
   }
 };
 
-const list = (req, res) => {
-  // Controlar que pagina estamos
-  let page = 1;
-  if (req.params.page) {
-    page = req.params.page;
-  }
+const list = async (req, res) => {
+  try {
+    // Controlar en qué página estamos
+    let page = 1;
+    if (req.params.page) {
+      page = parseInt(req.params.page);
+    }
 
-  page = parseInt(page);
+    // Consulta con mongoose paginate
+    let itemsPerPage = 5;
 
-  // Consulta con mongoose pagination
-  let itemsPerPage = 5;
+    const result = await User.paginate(
+      {},
+      {
+        page,
+        limit: itemsPerPage,
+        sort: { _id: 1 }, // Orden ascendente por el campo _id
+        select: "-password -email -role -__v",
+      }
+    );
 
-  User.sort("_id").paginate(page, itemsPerPage, (error, users, total) => {
-    if (error || !users) {
+    if (!result.docs || result.docs.length === 0) {
       return res.status(404).send({
         status: "error",
         message: "No hay usuarios disponibles",
-        error,
       });
     }
-    // Devolver resultado
+
+    // Sacar un array de IDs de los usuarios que me siguen y los que sigo como victor
+    let followUserIds = await followService.followUserIds(req.user.id);
+
+    // Devolver el resultado (posteriormente info follow)
     return res.status(200).send({
       status: "success",
-      users,
-      page,
-      itemsPerPage,
-      total,
-      pages: Math.ceil(total / itemsPerPage),
+      users: result.docs,
+      page: result.page,
+      itemsPerPage: result.limit,
+      total: result.totalDocs,
+      pages: result.totalPages,
+      user_following: followUserIds.following,
+      user_follow_me: followUserIds.followers,
     });
-  });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({
+      status: "error",
+      message: "Error al obtener la lista de usuarios",
+      error: error.message,
+    });
+  }
 };
 
 const update = async (req, res) => {
@@ -322,6 +349,25 @@ const upload = async (req, res) => {
   }
 };
 
+const avatar = (req, res) => {
+  // Sacar el parametro de la url
+  const file = req.params.file;
+  // Montar el path real de la imagen
+  const filePath = "./uploads/avatars/" + file;
+  // Comprobar que existe
+  fs.stat(filePath, (error, exists) => {
+    if (!exists) {
+      return res.status(404).send({
+        status: "error",
+        message: "No existe la imagen",
+      });
+    }
+    // Devolver un file
+    return res.sendFile(path.resolve(filePath));
+  });
+  // Devolver un file
+};
+
 // Exportar acciones
 module.exports = {
   pruebaUser,
@@ -331,4 +377,5 @@ module.exports = {
   list,
   update,
   upload,
+  avatar,
 };
