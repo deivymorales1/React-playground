@@ -6,7 +6,7 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState({});
   const [counters, setCounters] = useState({});
-
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     authUser();
@@ -20,6 +20,7 @@ export const AuthProvider = ({ children }) => {
 
     // Comprobar si tengo el token y el usuario
     if (!token || !user) {
+      setLoading(false);
       return false;
     }
 
@@ -35,31 +36,37 @@ export const AuthProvider = ({ children }) => {
         Authorization: token,
       },
     });
-
+    // Acceso a todos los datos del usuario
     const data = await request.json();
 
     // Peticion para los contadores
-    const requestCounters = await fetch(Global.url + "user/counters/" + userId, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token,
-      },
-    });
+    const requestCounters = await fetch(
+      Global.url + "user/counters/" + userId,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    );
 
     const dataCounters = await requestCounters.json();
 
     // Setear el estado auth
     setAuth(data.user);
-    setCounters(dataCounters)
+    setCounters(dataCounters);
+    setLoading(false);
   };
 
   return (
     <AuthContext.Provider
       value={{
+        // Acceso a los metodos en cualquier componente
         auth,
         setAuth,
-        counters
+        counters,
+        loading,
       }}
     >
       {children}

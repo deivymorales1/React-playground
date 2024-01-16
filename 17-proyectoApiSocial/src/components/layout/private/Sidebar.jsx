@@ -16,14 +16,17 @@ export const Sidebar = () => {
         <div className="aside__profile-info">
           <div className="profile-info__general-info">
             <div className="general-info__container-avatar">
-              {auth.image != "default.png" && (
+              {auth.image !== "default.png" && (
                 <img
                   src={Global.url + "user/avatar/" + auth.image}
                   className="container-avatar__img"
                   alt="Foto de perfil"
+                  onError={(e) => {
+                    e.target.src = avatar; // Si hay un error de carga, muestra el avatar predeterminado
+                  }}
                 />
               )}
-              {auth.image = "default.png" && (
+              {auth.image === "default.png" && (
                 <img
                   src={avatar}
                   className="container-avatar__img"
@@ -57,7 +60,9 @@ export const Sidebar = () => {
             <div className="stats__following">
               <a href="#" className="following__link">
                 <span className="following__title">Publicaciones</span>
-                <span className="following__number">{counters.publications} </span>
+                <span className="following__number">
+                  {counters.publications}{" "}
+                </span>
               </a>
             </div>
           </div>
@@ -66,14 +71,14 @@ export const Sidebar = () => {
         <div className="aside__container-form">
           <form className="container-form__form-post">
             <div className="form-post__inputs">
-              <label for="post" className="form-post__label">
+              <label htmlFor="post" className="form-post__label">
                 ¿Que estas pesando hoy?
               </label>
               <textarea name="post" className="form-post__textarea"></textarea>
             </div>
 
             <div className="form-post__inputs">
-              <label for="image" className="form-post__label">
+              <label htmlFor="image" className="form-post__label">
                 Sube tu foto
               </label>
               <input type="file" name="image" className="form-post__image" />
