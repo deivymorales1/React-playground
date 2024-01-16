@@ -12,6 +12,8 @@ const jwt = require("../services/jwt");
 const followService = require("../services/followService");
 const user = require("../models/user");
 const fastify = require("fastify");
+const Follow = require("../models/follow");
+const Publication = require("../models/publication");
 
 // Acciones de prueba
 const pruebaUser = (req, res) => {
@@ -375,11 +377,11 @@ const counters = async (req, res) => {
   }
 
   try {
-    const following = await Follow.count({ user: userId });
+    const following = await Follow.countDocuments({ user: userId });
 
-    const followed = await Follow.count({ followed: userId });
+    const followed = await Follow.countDocuments({ followed: userId });
 
-    const publications = await Publication.count({ user: userId });
+    const publications = await Publication.countDocuments({ user: userId });
 
     return res.status(200).send({
       userId,
@@ -388,10 +390,11 @@ const counters = async (req, res) => {
       publications: publications,
     });
   } catch (error) {
+    console.log('Error  en counters: ', error);
     return res.status(500).send({
       status: "error",
-      message: "Error en los contadores",
-      error: error.message,
+      message: "Error en las actualizaciones",
+      error,
     });
   }
 };
