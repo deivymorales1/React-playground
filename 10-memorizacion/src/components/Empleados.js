@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 // Memorizar resultado de un componente y solo renderiza si cambia la vista.
-export const Empleados = React.memo(({ pagina }) => {
+export const Empleados = React.memo(({ pagina, mensaje }) => {
   const [empleados, setEmpleados] = useState([]);
 
   useEffect(() => {
@@ -14,11 +14,11 @@ export const Empleados = React.memo(({ pagina }) => {
     const { data: empleados } = await peticion.json();
 
     setEmpleados(empleados);
-
   };
 
   useEffect(() => {
     conseguirEmpleados(pagina);
+    mensaje();
   }, [pagina]);
 
   return (

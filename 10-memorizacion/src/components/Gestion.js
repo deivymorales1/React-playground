@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Empleados } from "./Empleados";
 
-const Gestion = () => {
+export const Gestion = () => {
   const [nombre, setNombre] = useState("");
   const [pagina, setPagina] = useState(1);
 
@@ -12,6 +12,12 @@ const Gestion = () => {
   useEffect(() => {
     console.log("Vista gestion actualizada");
   }, [nombre, pagina]);
+
+  // Para memorizar funciones
+  const mostrarMensaje = useCallback(() => {
+    console.log('Hola que tal soy un mensaje desde el componente empleados');
+  }, [pagina])
+
 
   return (
     <div>
@@ -37,9 +43,8 @@ const Gestion = () => {
       >
         Pagina 2
       </button>
-      <Empleados pagina={pagina} />
+      <Empleados pagina={pagina} mensaje={mostrarMensaje} />
     </div>
   );
 };
 
-export default Gestion;
