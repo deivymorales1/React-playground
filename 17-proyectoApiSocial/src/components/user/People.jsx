@@ -1,9 +1,5 @@
-import React from 'react'
+import React from "react";
 
-const People = () => {
-  return (
-    <div>People</div>
-  )
-}
-
-export default People
+export const People = () => {
+  return <div>People</div>;
+};

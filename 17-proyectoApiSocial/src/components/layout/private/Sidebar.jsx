@@ -16,17 +16,14 @@ export const Sidebar = () => {
         <div className="aside__profile-info">
           <div className="profile-info__general-info">
             <div className="general-info__container-avatar">
-              {auth.image !== "default.png" && (
+              {auth.image != "default.png" && (
                 <img
                   src={Global.url + "user/avatar/" + auth.image}
                   className="container-avatar__img"
                   alt="Foto de perfil"
-                  onError={(e) => {
-                    e.target.src = avatar; // Si hay un error de carga, muestra el avatar predeterminado
-                  }}
                 />
               )}
-              {auth.image === "default.png" && (
+              {auth.image == "default.png" && (
                 <img
                   src={avatar}
                   className="container-avatar__img"
