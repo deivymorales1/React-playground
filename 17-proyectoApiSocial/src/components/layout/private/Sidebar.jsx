@@ -13,6 +13,8 @@ export const Sidebar = () => {
   const savePublication = async (e) => {
     e.preventDefault();
 
+    const token = localStorage.getItem("token");
+
     // Recoger datos del  formulario
     let newPublication = form;
     newPublication.user = auth.id;
@@ -23,7 +25,7 @@ export const Sidebar = () => {
       body: JSON.stringify(newPublication),
       headers: {
         "Content-Type": "application/json",
-        Authorization: localStorage.getItem("token"),
+        Authorization: token,
       },
     });
 
@@ -34,6 +36,34 @@ export const Sidebar = () => {
       setStored("stored");
     } else {
       setStored("error");
+    }
+
+    // Subir imagen
+    const fileInput = document.querySelector("#file");
+
+    if (data.status == "success" && fileInput.files[0]) {
+      const formData = new FormData();
+      formData.append("file0", fileInput.files[0]);
+
+      // Peticion
+      const uploadRequest = await fetch(
+        Global.url + "publication/upload/" + data.publicationStored._id,
+        {
+          method: "POST",
+          body: formData,
+          headers: {
+            Authorization: token,
+          },
+        }
+      );
+
+      const uploadData = await uploadRequest.json();
+
+      if (uploadData.status == "success") {
+        setStored("stored");
+      } else {
+        setStored("error");
+      }
     }
   };
 
