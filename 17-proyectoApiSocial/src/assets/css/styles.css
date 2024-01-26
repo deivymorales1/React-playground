@@ -249,7 +249,7 @@ body {
   border-color: var(--color-border-btn-success);
 }
 
-.post__button--green:hover{
+.post__button--green:hover {
   background-color: var(--color-background-btn-success-hover);
   border-color: var(--color-border-btn-success-hover);
 }
@@ -435,7 +435,7 @@ button {
 }
 
 .alert {
-  width: 50%;
+  width: 100%;
   display: block;
   padding: 1rem;
   margin-bottom: 1rem;
