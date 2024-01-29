@@ -14,6 +14,11 @@ const Profile = () => {
     getCounters();
   }, []);
 
+  useEffect(() => {
+    GetProfile(params.userId, setUser);
+    getCounters();
+  }, [params]);
+
   // contadores
   const getCounters = async () => {
     const request = await fetch(Global.url + "user/counters/" + params.userId, {
@@ -68,15 +73,27 @@ const Profile = () => {
 
         <div className="profile-info__stats">
           <div className="stats__following">
-            <Link to={"/social/siguiendo/" + user._id} className="following__link">
+            <Link
+              to={"/social/siguiendo/" + user._id}
+              className="following__link"
+            >
               <span className="following__title">Siguiendo</span>
-              <span className="following__number"> {counters.following} </span>
+              <span className="following__number">
+                {" "}
+                {counters.following >= 1 ? counters.following : 0}{" "}
+              </span>
             </Link>
           </div>
           <div className="stats__following">
-            <Link to={"/social/seguidores/" + user._id} className="following__link">
+            <Link
+              to={"/social/seguidores/" + user._id}
+              className="following__link"
+            >
               <span className="following__title">Seguidores</span>
-              <span className="following__number"> {counters.followed} </span>
+              <span className="following__number">
+                {" "}
+                {counters.followed >= 1 ? counters.followed : 0}{" "}
+              </span>
             </Link>
           </div>
 
@@ -85,7 +102,7 @@ const Profile = () => {
               <span className="following__title">Publicaciones</span>
               <span className="following__number">
                 {" "}
-                {counters.publications}{" "}
+                {counters.publications >= 1 ? counters.publications : 0}{" "}
               </span>
             </Link>
           </div>
