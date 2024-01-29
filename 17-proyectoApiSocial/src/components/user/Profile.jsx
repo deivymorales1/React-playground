@@ -3,21 +3,29 @@ import avatar from "../../assets/img/user.png";
 import { GetProfile } from "../../helpers/GetProfile";
 import { Link, useParams } from "react-router-dom";
 import { Global } from "../../helpers/Global";
+import useAuth from "../../hooks/useAuth";
 
 const Profile = () => {
+  const { auth } = useAuth();
   const [user, setUser] = useState({});
   const [counters, setCounters] = useState({});
+  const [iFollow, setIFollow] = useState(false);
   const params = useParams();
 
   useEffect(() => {
-    GetProfile(params.userId, setUser);
+    getDataUser();
     getCounters();
   }, []);
 
   useEffect(() => {
-    GetProfile(params.userId, setUser);
+    getDataUser();
     getCounters();
   }, [params]);
+
+  const getDataUser = async () => {
+    let dataUser = await GetProfile(params.userId, setUser);
+    if (dataUser.following && dataUser.following._id) setIFollow(true);
+  };
 
   // contadores
   const getCounters = async () => {
@@ -33,6 +41,43 @@ const Profile = () => {
 
     if (data.following) {
       setCounters(data);
+    }
+  };
+
+  const follow = async (userId) => {
+    // Peticion al backend para guardar el follow
+    const request = await fetch(Global.url + "follow/save", {
+      method: "POST",
+      body: JSON.stringify({ followed: userId }),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: localStorage.getItem("token"),
+      },
+    });
+
+    const data = await request.json();
+
+    // Cuando este todo correcto
+    if (data.status == "success") {
+      setIFollow(true);
+    }
+  };
+
+  const unfollow = async (userId) => {
+    // Peticion al backend para borrar el follow
+    const request = await fetch(Global.url + "follow/unfollow/" + userId, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: localStorage.getItem("token"),
+      },
+    });
+
+    const data = await request.json();
+
+    // Cuando este todo correcto
+    if (data.status == "success") {
+      setIFollow(false);
     }
   };
 
@@ -58,14 +103,27 @@ const Profile = () => {
           </div>
 
           <div className="general-info__container-names">
-            <p className="container-names__name">
+            <div className="container-names__name">
               <h1>
                 {user.name} {user.surname}
               </h1>
-              <button className="content__button content__button--rigth">
-                Seguir
-              </button>
-            </p>
+              {user._id != auth._id &&
+                (iFollow ? (
+                  <button
+                    onClick={() => unfollow(user._id)}
+                    className="content__button content__button--rigth post__button"
+                  >
+                    Dejar de seguir
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => follow(user._id)}
+                    className="content__button content__button--rigth"
+                  >
+                    Seguir
+                  </button>
+                ))}
+            </div>
             <h2 className="container-names__nickname">{user.nick}</h2>
             <p> {user.bio} </p>
           </div>
