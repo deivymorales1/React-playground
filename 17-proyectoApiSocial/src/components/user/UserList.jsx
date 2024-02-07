@@ -3,6 +3,7 @@ import avatar from "../../assets/img/user.png";
 import { Global } from "../../helpers/Global";
 import useAuth from "../../hooks/useAuth";
 import { Link } from "react-router-dom";
+import ReactTimeAgo from "react-time-ago";
 
 export const UserList = ({
   users,
@@ -108,7 +109,7 @@ export const UserList = ({
                       to={"/social/perfil/" + user._id}
                       className="user-info__create-date"
                     >
-                      {user.created_at}
+                      <ReactTimeAgo date={user.created_at} locale="es-Es" />
                     </Link>
                   </div>
 
