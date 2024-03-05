@@ -14,6 +14,7 @@ const user = require("../models/user");
 const fastify = require("fastify");
 const Follow = require("../models/follow");
 const Publication = require("../models/publication");
+const validate = require("../helpers/validate");
 
 // Acciones de prueba
 const pruebaUser = (req, res) => {
@@ -32,6 +33,16 @@ const register = async (req, res) => {
     return res.status(400).json({
       status: "error",
       message: "Faltan datos por enviar",
+    });
+  }
+
+  // Validacion avanzada
+  try {
+    validate(params);
+  } catch (error) {
+    return res.status(400).json({
+      status: "error",
+      message: "Validacion no superada",
     });
   }
 
@@ -390,7 +401,7 @@ const counters = async (req, res) => {
       publications: publications,
     });
   } catch (error) {
-    console.log('Error  en counters: ', error);
+    console.log("Error  en counters: ", error);
     return res.status(500).send({
       status: "error",
       message: "Error en las actualizaciones",
