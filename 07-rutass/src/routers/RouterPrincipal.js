@@ -46,7 +46,7 @@ const RouterPrincipal = () => {
         <Route path="/inicio" element={<Inicio />} />
         <Route path="/articulos" element={<Articulo />} />
         <Route path="/contacto" element={<Contacto />} />
-        <Route path="/persona/:nombre/:apellido" element={<Persona />} />
+        <Route path="/persona/:nombre?/:apellido?" element={<Persona />} />
         <Route
           path="*" // Cualquier cosa
           element={<Error />}
